@@ -1,6 +1,9 @@
 -- ===========================================================
 -- DATABASE: Clinic Appointment Booking System
 -- ===========================================================
+DROP DATABASE clinic_db;
+-- Then run the updated clinic_db.sql script
+
 CREATE DATABASE IF NOT EXISTS clinic_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE clinic_db;
 
@@ -42,7 +45,7 @@ CREATE TABLE user_roles (
 -- ===========================================================
 CREATE TABLE doctors (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                         user_id BIGINT NOT NULL,
+                         user_id BIGINT NOT NULL UNIQUE,
                          specialization VARCHAR(100) NOT NULL,
                          experience_years INT DEFAULT 0,
                          available BOOLEAN DEFAULT TRUE,
@@ -54,7 +57,7 @@ CREATE TABLE doctors (
 -- ===========================================================
 CREATE TABLE patients (
                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                          user_id BIGINT NOT NULL,
+                          user_id BIGINT NOT NULL UNIQUE,
                           date_of_birth DATE,
                           gender ENUM('MALE', 'FEMALE', 'OTHER'),
                           phone VARCHAR(20),
@@ -97,6 +100,8 @@ VALUES (2, 'Cardiology', 5, TRUE);
 INSERT INTO patients (user_id, date_of_birth, gender, phone, address)
 VALUES (3, '1995-04-12', 'FEMALE', '0988888888', 'Ho Chi Minh City');
 
--- Example Appointment
-INSERT INTO appointments (patient_id, doctor_id, appointment_time, status, notes)
-VALUES (1, 1, '2025-10-26 09:00:00', 'PENDING', 'Heart checkup');
+-- NOTE: Sample appointment removed - should be created through the application UI to ensure proper patient-user mapping
+-- If you want to add a test appointment, create it with:
+-- INSERT INTO appointments (patient_id, doctor_id, appointment_time, status, notes)
+-- VALUES (1, 1, '2025-10-26 09:00:00', 'PENDING', 'Heart checkup');
+-- where patient_id = 1 corresponds to patient01 (user_id = 3)

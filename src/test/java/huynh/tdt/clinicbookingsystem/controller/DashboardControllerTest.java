@@ -1,8 +1,10 @@
 package huynh.tdt.clinicbookingsystem.controller;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.ui.Model;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 class DashboardControllerTest {
 
@@ -10,8 +12,11 @@ class DashboardControllerTest {
 
     @Test
     void testDashboardPage() {
+        // Arrange
+        Model model = mock(Model.class);
+
         // Act
-        String viewName = dashboardController.dashboard();
+        String viewName = dashboardController.dashboard(model);
 
         // Assert
         assertEquals("dashboard", viewName);
@@ -20,8 +25,11 @@ class DashboardControllerTest {
 
     @Test
     void testDashboardPageReturnType() {
+        // Arrange
+        Model model = mock(Model.class);
+
         // Act
-        Object result = dashboardController.dashboard();
+        Object result = dashboardController.dashboard(model);
 
         // Assert
         assertNotNull(result);
@@ -30,8 +38,11 @@ class DashboardControllerTest {
 
     @Test
     void testDashboardPageCorrectViewName() {
+        // Arrange
+        Model model = mock(Model.class);
+
         // Act
-        String viewName = dashboardController.dashboard();
+        String viewName = dashboardController.dashboard(model);
 
         // Assert
         assertEquals("dashboard", viewName);
@@ -39,9 +50,12 @@ class DashboardControllerTest {
 
     @Test
     void testDashboardPageMultipleCalls() {
+        // Arrange
+        Model model = mock(Model.class);
+
         // Act
-        String result1 = dashboardController.dashboard();
-        String result2 = dashboardController.dashboard();
+        String result1 = dashboardController.dashboard(model);
+        String result2 = dashboardController.dashboard(model);
 
         // Assert
         assertEquals(result1, result2);
@@ -50,8 +64,11 @@ class DashboardControllerTest {
 
     @Test
     void testDashboardPageNotNull() {
+        // Arrange
+        Model model = mock(Model.class);
+
         // Act
-        String viewName = dashboardController.dashboard();
+        String viewName = dashboardController.dashboard(model);
 
         // Assert
         assertNotNull(viewName);
