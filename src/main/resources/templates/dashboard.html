@@ -248,12 +248,41 @@
                     <a href="/doctors/search" class="btn">Find Doctor</a>
                 </div>
 
+                <div class="feature-card" th:if="${userRole == 'PATIENT'}">
+                    <div class="card-icon">👤</div>
+                    <h3>My Profile</h3>
+                    <p>Update your personal and medical information.</p>
+                    <a href="/patient/profile" class="btn">Edit Profile</a>
+                </div>
+
                 <!-- Doctor Features -->
                 <div class="feature-card" th:if="${userRole == 'DOCTOR'}">
                     <div class="card-icon">📅</div>
                     <h3>My Appointments</h3>
                     <p>View and manage your scheduled appointments with patients.</p>
                     <a href="/doctor/appointments" class="btn">View Appointments</a>
+                </div>
+
+                <!-- Admin Features -->
+                <div class="feature-card" th:if="${userRole == 'ADMIN'}">
+                    <div class="card-icon">🏥</div>
+                    <h3>Admin Dashboard</h3>
+                    <p>System overview and administration tools.</p>
+                    <a href="/admin/dashboard" class="btn">Go to Admin</a>
+                </div>
+
+                <div class="feature-card" th:if="${userRole == 'ADMIN'}">
+                    <div class="card-icon">👥</div>
+                    <h3>Manage Users</h3>
+                    <p>View and manage all system users and their roles.</p>
+                    <a href="/admin/users" class="btn">Manage Users</a>
+                </div>
+
+                <div class="feature-card" th:if="${userRole == 'ADMIN'}">
+                    <div class="card-icon">📊</div>
+                    <h3>Statistics</h3>
+                    <p>View system statistics and performance metrics.</p>
+                    <a href="/admin/statistics" class="btn">View Stats</a>
                 </div>
             </div>
         </div>

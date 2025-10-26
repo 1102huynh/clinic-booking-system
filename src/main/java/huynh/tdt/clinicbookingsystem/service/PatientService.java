@@ -72,5 +72,12 @@ public class PatientService {
 
         return patientRepository.save(patient);
     }
-}
 
+    /**
+     * Update patient (direct save)
+     */
+    @Transactional
+    public Patient updatePatient(Patient patient) {
+        return patientRepository.save(patient);
+    }
+}

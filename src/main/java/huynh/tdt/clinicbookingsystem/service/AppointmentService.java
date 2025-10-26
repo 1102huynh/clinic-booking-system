@@ -28,6 +28,9 @@ public class AppointmentService {
     @Autowired
     private DoctorRepository doctorRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     /**
      * Book a new appointment for a patient
      */
@@ -107,6 +110,19 @@ public class AppointmentService {
         appointment.setStatus(Appointment.AppointmentStatus.CANCELLED);
         Appointment updatedAppointment = appointmentRepository.save(appointment);
 
+        // Send cancellation email to patient
+        try {
+            String patientEmail = updatedAppointment.getPatient().getUser().getEmail();
+            String patientName = updatedAppointment.getPatient().getUser().getFullName();
+            String doctorName = updatedAppointment.getDoctor().getUser().getFullName();
+            String appointmentDate = updatedAppointment.getAppointmentTime().toLocalDate().toString();
+            String appointmentTime = updatedAppointment.getAppointmentTime().toLocalTime().toString();
+
+            emailService.sendAppointmentCancelledEmail(patientEmail, patientName, doctorName, appointmentDate, appointmentTime);
+        } catch (Exception e) {
+            // Log but don't fail the transaction if email fails
+        }
+
         return convertToResponse(updatedAppointment);
     }
 
@@ -125,6 +141,19 @@ public class AppointmentService {
         appointment.setStatus(Appointment.AppointmentStatus.CONFIRMED);
         Appointment updatedAppointment = appointmentRepository.save(appointment);
 
+        // Send confirmation email to patient
+        try {
+            String patientEmail = updatedAppointment.getPatient().getUser().getEmail();
+            String patientName = updatedAppointment.getPatient().getUser().getFullName();
+            String doctorName = updatedAppointment.getDoctor().getUser().getFullName();
+            String appointmentDate = updatedAppointment.getAppointmentTime().toLocalDate().toString();
+            String appointmentTime = updatedAppointment.getAppointmentTime().toLocalTime().toString();
+
+            emailService.sendAppointmentConfirmedEmail(patientEmail, patientName, doctorName, appointmentDate, appointmentTime);
+        } catch (Exception e) {
+            // Log but don't fail the transaction if email fails
+        }
+
         return convertToResponse(updatedAppointment);
     }
 
@@ -142,6 +171,18 @@ public class AppointmentService {
 
         appointment.setStatus(Appointment.AppointmentStatus.COMPLETED);
         Appointment updatedAppointment = appointmentRepository.save(appointment);
+
+        // Send completion email to patient
+        try {
+            String patientEmail = updatedAppointment.getPatient().getUser().getEmail();
+            String patientName = updatedAppointment.getPatient().getUser().getFullName();
+            String doctorName = updatedAppointment.getDoctor().getUser().getFullName();
+            String appointmentDate = updatedAppointment.getAppointmentTime().toLocalDate().toString();
+
+            emailService.sendAppointmentCompletedEmail(patientEmail, patientName, doctorName, appointmentDate);
+        } catch (Exception e) {
+            // Log but don't fail the transaction if email fails
+        }
 
         return convertToResponse(updatedAppointment);
     }
