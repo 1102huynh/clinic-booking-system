@@ -57,6 +57,14 @@ public class DoctorService {
     }
 
     /**
+     * Get doctor entity by user ID (not DTO)
+     */
+    public Doctor getDoctorByUserId(Long userId) {
+        return doctorRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Doctor profile not found for user"));
+    }
+
+    /**
      * Convert Doctor entity to DoctorResponse DTO
      */
     private DoctorResponse convertToResponse(Doctor doctor) {
@@ -69,4 +77,3 @@ public class DoctorService {
         );
     }
 }
-

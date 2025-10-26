@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - Doctor Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .appointments-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .appointment-card {
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .appointment-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .appointment-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .appointment-card.confirmed {
+            border-left-color: #28a745;
+        }
+
+        .appointment-card.completed {
+            border-left-color: #6c757d;
+        }
+
+        .appointment-card.cancelled {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .patient-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .appointment-time {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+        }
+
+        .appointment-notes {
+            color: #888;
+            font-size: 13px;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-confirm {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-complete {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 5px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            margin-top: auto;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        footer p {
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .appointment-header {
+                flex-direction: column;
+            }
+
+            .status-badge {
+                margin-top: 0.5rem;
+            }
+
+            .appointment-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <h1>🏥 Doctor Portal</h1>
+            <div class="user-info" th:if="${username}">
+                <span>👨‍⚕️</span>
+                <span th:text="'Dr. ' + ${username}"></span>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+            <div class="page-header">
+                <h2 class="page-title">My Appointments</h2>
+                <p class="page-subtitle">Manage your scheduled appointments</p>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <!-- No Appointments -->
+            <div th:if="${#lists.isEmpty(appointments)}" class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <h3>No Appointments</h3>
+                <p>You don't have any appointments scheduled yet.</p>
+            </div>
+
+            <!-- Appointments List -->
+            <div th:if="${!#lists.isEmpty(appointments)}" class="appointments-container">
+                <div th:each="appointment : ${appointments}"
+                     class="appointment-card"
+                     th:classappend="${'appointment-card-' + appointment.status.toLowerCase()}">
+
+                    <div class="appointment-header">
+                        <div class="appointment-info">
+                            <div class="patient-name">👤 <span th:text="${appointment.patientName}">Patient Name</span></div>
+                            <div class="appointment-time">
+                                📅 <span th:text="${#temporals.format(appointment.appointmentTime, 'dd MMM yyyy')}">Date</span>
+                                <span th:text="${#temporals.format(appointment.appointmentTime, 'HH:mm')}">Time</span>
+                            </div>
+                            <div th:if="${appointment.notes != null and appointment.notes != ''}" class="appointment-notes">
+                                📝 <span th:text="${appointment.notes}">Notes</span>
+                            </div>
+                        </div>
+                        <span class="status-badge"
+                              th:classappend="${'status-' + appointment.status.toLowerCase()}"
+                              th:text="${appointment.status}">Status</span>
+                    </div>
+
+                    <!-- Actions based on status -->
+                    <div class="appointment-actions">
+                        <!-- Pending Appointment: Confirm or Reject -->
+                        <div th:if="${appointment.status == 'PENDING'}">
+                            <form th:action="@{/doctor/appointments/{id}/confirm(id=${appointment.id})}"
+                                  method="post"
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-confirm">✓ Confirm</button>
+                            </form>
+                            <form th:action="@{/doctor/appointments/{id}/reject(id=${appointment.id})}"
+                                  method="post"
+                                  style="display: inline;"
+                                  onsubmit="return confirm('Are you sure you want to reject this appointment?');">
+                                <button type="submit" class="btn btn-reject">✗ Reject</button>
+                            </form>
+                        </div>
+
+                        <!-- Confirmed Appointment: Mark as Complete or Reject -->
+                        <div th:if="${appointment.status == 'CONFIRMED'}">
+                            <form th:action="@{/doctor/appointments/{id}/complete(id=${appointment.id})}"
+                                  method="post"
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-complete">✓ Mark Complete</button>
+                            </form>
+                            <form th:action="@{/doctor/appointments/{id}/reject(id=${appointment.id})}"
+                                  method="post"
+                                  style="display: inline;"
+                                  onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                <button type="submit" class="btn btn-reject">✗ Cancel</button>
+                            </form>
+                        </div>
+
+                        <!-- Completed or Cancelled: No actions -->
+                        <div th:if="${appointment.status == 'COMPLETED' || appointment.status == 'CANCELLED'}">
+                            <button disabled class="btn btn-disabled">No Actions Available</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Clinic Booking System - Doctor Portal</p>
+        </footer>
+    </div>
+</body>
+</html>
+

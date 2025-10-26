@@ -226,25 +226,34 @@
             </div>
 
             <div class="features">
-                <div class="feature-card">
+                <!-- Patient Features -->
+                <div class="feature-card" th:if="${userRole == 'PATIENT'}">
                     <div class="card-icon">📅</div>
                     <h3>Book Appointment</h3>
                     <p>Schedule your appointment with your preferred doctor or specialist.</p>
                     <a href="/appointment/book" class="btn">Book Now</a>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card" th:if="${userRole == 'PATIENT'}">
                     <div class="card-icon">📋</div>
                     <h3>My Appointments</h3>
                     <p>View and manage all your upcoming and past appointments.</p>
                     <a href="/appointment/my-appointments" class="btn">View Appointments</a>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card" th:if="${userRole == 'PATIENT'}">
                     <div class="card-icon">👨‍⚕️</div>
                     <h3>Find Doctor</h3>
                     <p>Search for doctors based on specialty and availability.</p>
-                    <a href="/appointment/book" class="btn">Find Doctor</a>
+                    <a href="/doctors/search" class="btn">Find Doctor</a>
+                </div>
+
+                <!-- Doctor Features -->
+                <div class="feature-card" th:if="${userRole == 'DOCTOR'}">
+                    <div class="card-icon">📅</div>
+                    <h3>My Appointments</h3>
+                    <p>View and manage your scheduled appointments with patients.</p>
+                    <a href="/doctor/appointments" class="btn">View Appointments</a>
                 </div>
             </div>
         </div>

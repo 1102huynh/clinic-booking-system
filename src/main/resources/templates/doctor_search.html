@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Find Doctors</title>
+    <style>
+        .search-form { display:flex; gap:8px; margin:1rem 0; }
+        .search-input { padding:8px; border-radius:4px; border:1px solid #ccc; }
+        .btn { padding:8px 12px; border-radius:4px; background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none; cursor:pointer; }
+        table { width:100%; border-collapse:collapse; margin-top:1rem;}
+        th, td { padding:8px; border-bottom:1px solid #eee; text-align:left;}
+        .available { color:green; font-weight:600; }
+        .not-available { color:#888; }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width:1200px; margin:2rem auto;">
+        <h2>Find Doctor</h2>
+
+        <form th:action="@{/doctors/search}" method="get" class="search-form">
+            <input class="search-input" type="text" name="q" placeholder="Name or keyword" th:value="${q}" />
+            <select name="specialization" class="search-input">
+                <option value="">All specializations</option>
+                <option th:each="s : ${specializations}" th:value="${s}" th:text="${s}" th:selected="${s == specialization}"></option>
+            </select>
+            <button class="btn" type="submit">Search</button>
+        </form>
+
+        <div th:if="${#lists.isEmpty(doctors)}">
+            <p>No doctors found.</p>
+        </div>
+
+        <table th:if="${!#lists.isEmpty(doctors)}">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Specialty</th>
+                    <th>Experience</th>
+                    <th>Availability</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="doctor : ${doctors}">
+                    <td th:text="${doctor.fullName}">Dr Name</td>
+                    <td th:text="${doctor.specialization}">Specialty</td>
+                    <td th:text="${doctor.experienceYears}">0</td>
+                    <td>
+                        <span th:if="${doctor.available}" class="available">Available</span>
+                        <span th:if="${!doctor.available}" class="not-available">Not available</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/appointment/book(doctorId=${doctor.id})}" class="btn">Book</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
