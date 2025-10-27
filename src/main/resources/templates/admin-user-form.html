@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit} ? 'Edit User - Admin Dashboard' : 'Add User - Admin Dashboard'"></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .form-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <h1 th:text="${isEdit} ? '✎ Edit User' : '➕ Add New User'"></h1>
+        </div>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <a href="/admin/users" class="back-link">← Back to Users</a>
+
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div class="card">
+                <h2 class="page-title" th:text="${isEdit} ? 'Edit User Details' : 'Create New User'"></h2>
+
+                <form th:action="${isEdit} ? @{/admin/users/{id}/edit(id=${user.id})} : @{/admin/users/add}"
+                      th:object="${user}" method="post">
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label for="username">Username <span style="color: #dc3545;">*</span></label>
+                        <input type="text" id="username" th:field="*{username}"
+                               required th:readonly="${isEdit}"
+                               placeholder="Enter username">
+                        <div class="form-hint" th:if="!${isEdit}">Username must be unique and cannot be changed later</div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="fullName">Full Name <span style="color: #dc3545;">*</span></label>
+                        <input type="text" id="fullName" th:field="*{fullName}"
+                               required placeholder="Enter full name">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email <span style="color: #dc3545;">*</span></label>
+                        <input type="email" id="email" th:field="*{email}"
+                               required placeholder="Enter email address">
+                    </div>
+
+                    <!-- Password (only on add) -->
+                    <div class="form-group" th:if="!${isEdit}">
+                        <label for="password">Password <span style="color: #dc3545;">*</span></label>
+                        <input type="password" id="password" name="password"
+                               required placeholder="Enter password">
+                        <div class="form-hint">Password must be at least 6 characters</div>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="form-group">
+                        <label for="role">Role <span style="color: #dc3545;">*</span></label>
+                        <select id="role" th:field="*{role}" required>
+                            <option value="">-- Select Role --</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="DOCTOR">Doctor</option>
+                            <option value="PATIENT">Patient</option>
+                        </select>
+                    </div>
+
+                    <!-- Enabled Status (only on edit) -->
+                    <div class="form-group" th:if="${isEdit}">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="enabled" th:field="*{enabled}">
+                            <label for="enabled" style="margin: 0;">Active User</label>
+                        </div>
+                        <div class="form-hint">Unchecked means user is disabled and cannot login</div>
+                    </div>
+
+                    <!-- Form Buttons -->
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">
+                            <span th:text="${isEdit} ? '💾 Update User' : '✅ Create User'"></span>
+                        </button>
+                        <a href="/admin/users" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Clinic Booking System. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+

@@ -9,6 +9,7 @@ import huynh.tdt.clinicbookingsystem.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,9 @@ public class AdminDashboardController {
 
     @Autowired
     private AppointmentService appointmentService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * Admin dashboard overview
@@ -129,6 +133,121 @@ public class AdminDashboardController {
             return "redirect:/admin/users/" + userId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to update user: " + e.getMessage());
+            return "redirect:/admin/users";
+        }
+    }
+
+    /**
+     * Show add user form
+     */
+    @GetMapping("/users/add")
+    public String showAddUserForm(Model model) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            model.addAttribute("username", username);
+            model.addAttribute("user", new User());
+            return "admin-user-form";
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to load form: " + e.getMessage());
+            return "admin-user-form";
+        }
+    }
+
+    /**
+     * Add new user
+     */
+    @PostMapping("/users/add")
+    public String addUser(@ModelAttribute User user, @RequestParam String password, RedirectAttributes redirectAttributes) {
+        try {
+            // Check if username already exists
+            if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+                redirectAttributes.addFlashAttribute("error", "Username already exists!");
+                return "redirect:/admin/users/add";
+            }
+
+            // Validate password
+            if (password == null || password.length() < 6) {
+                redirectAttributes.addFlashAttribute("error", "Password must be at least 6 characters!");
+                return "redirect:/admin/users/add";
+            }
+
+            // Encode password
+            user.setPassword(passwordEncoder.encode(password));
+
+            // Set default values
+            user.setEnabled(true);
+
+            // Save user
+            User savedUser = userRepository.save(user);
+            redirectAttributes.addFlashAttribute("success", "User created successfully!");
+            return "redirect:/admin/users/" + savedUser.getId();
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to create user: " + e.getMessage());
+            return "redirect:/admin/users/add";
+        }
+    }
+
+    /**
+     * Show edit user form
+     */
+    @GetMapping("/users/{userId}/edit")
+    public String showEditUserForm(@PathVariable Long userId, Model model) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            model.addAttribute("username", username);
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            model.addAttribute("user", user);
+            model.addAttribute("isEdit", true);
+            return "admin-user-form";
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to load user: " + e.getMessage());
+            return "admin-user-form";
+        }
+    }
+
+    /**
+     * Update user
+     */
+    @PostMapping("/users/{userId}/edit")
+    public String editUser(@PathVariable Long userId, @ModelAttribute User userUpdates, RedirectAttributes redirectAttributes) {
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Update fields
+            user.setFullName(userUpdates.getFullName());
+            user.setEmail(userUpdates.getEmail());
+            user.setRole(userUpdates.getRole());
+
+            // Save updated user
+            userRepository.save(user);
+            redirectAttributes.addFlashAttribute("success", "User updated successfully!");
+            return "redirect:/admin/users/" + userId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to update user: " + e.getMessage());
+            return "redirect:/admin/users/" + userId;
+        }
+    }
+
+    /**
+     * Delete user
+     */
+    @PostMapping("/users/{userId}/delete")
+    public String deleteUser(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            String username = user.getUsername();
+            userRepository.deleteById(userId);
+            redirectAttributes.addFlashAttribute("success", "User '" + username + "' deleted successfully!");
+            return "redirect:/admin/users";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to delete user: " + e.getMessage());
             return "redirect:/admin/users";
         }
     }

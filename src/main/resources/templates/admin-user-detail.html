@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users - Admin Dashboard</title>
+    <title>User Details - Admin Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -67,23 +67,11 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 2rem auto;
             padding: 0 2rem;
             width: 100%;
             flex: 1;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .page-title {
-            font-size: 32px;
-            color: #333;
         }
 
         .back-link {
@@ -96,6 +84,18 @@
 
         .back-link:hover {
             text-decoration: underline;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #333;
         }
 
         .alert {
@@ -120,30 +120,44 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            padding: 2rem;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .detail-section {
+            margin-bottom: 2rem;
         }
 
-        th {
-            background: #f9f9f9;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
+        .detail-section h3 {
+            font-size: 18px;
             color: #333;
-            border-bottom: 2px solid #eee;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
         }
 
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
+        .detail-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1rem;
         }
 
-        tr:hover {
-            background: #f9f9f9;
+        .detail-col {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
         }
 
         .status-badge {
@@ -191,12 +205,12 @@
 
         .btn {
             display: inline-block;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.5rem;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
             border: none;
@@ -206,19 +220,6 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-small {
-            padding: 0.4rem 0.8rem;
-            font-size: 11px;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
         }
 
         .btn-warning {
@@ -238,24 +239,22 @@
             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
         }
 
-        .btn-info {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        .btn-secondary {
+            background: #6c757d;
         }
 
-        .btn-info:hover {
-            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
         }
 
         .action-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
             flex-wrap: wrap;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #666;
         }
 
         footer {
@@ -275,22 +274,18 @@
             .page-header {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .detail-row {
+                grid-template-columns: 1fr;
                 gap: 1rem;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 0.75rem;
             }
 
             .action-buttons {
                 flex-direction: column;
             }
 
-            .btn-small {
+            .btn {
                 width: 100%;
                 text-align: center;
             }
@@ -300,7 +295,7 @@
 <body>
     <nav class="navbar">
         <div class="navbar-left">
-            <h1>🏥 User Management</h1>
+            <h1>👤 User Details</h1>
         </div>
         <form th:action="@{/logout}" method="post" style="display: inline;">
             <button type="submit" class="logout-btn">Logout</button>
@@ -309,63 +304,84 @@
 
     <div class="main-content">
         <div class="container">
-            <a href="/admin/dashboard" class="back-link">← Back to Admin Dashboard</a>
-
-            <div class="page-header">
-                <h2 class="page-title">👥 Manage Users</h2>
-                <a href="/admin/users/add" class="btn btn-success">+ Add New User</a>
-            </div>
+            <a href="/admin/users" class="back-link">← Back to Users</a>
 
             <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
             <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-            <div class="card" th:if="${users != null and users.size() > 0}">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Full Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="user : ${users}">
-                            <td th:text="${user.username}"></td>
-                            <td th:text="${user.fullName ?: 'N/A'}"></td>
-                            <td th:text="${user.email ?: 'N/A'}"></td>
-                            <td>
-                                <span class="role-badge"
-                                      th:classappend="${user.role == 'ADMIN' ? 'role-admin' : (user.role == 'DOCTOR' ? 'role-doctor' : 'role-patient')}"
-                                      th:text="${user.role ?: 'N/A'}"></span>
-                            </td>
-                            <td>
+            <div class="card" th:if="${user}">
+                <div class="page-header">
+                    <h2 class="page-title" th:text="${user.username}"></h2>
+                    <span class="status-badge"
+                          th:classappend="${user.enabled} ? 'status-active' : 'status-inactive'"
+                          th:text="${user.enabled} ? 'Active' : 'Inactive'"></span>
+                </div>
+
+                <!-- User Information -->
+                <div class="detail-section">
+                    <h3>ℹ️ User Information</h3>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Username</div>
+                            <div class="detail-value" th:text="${user.username}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Full Name</div>
+                            <div class="detail-value" th:text="${user.fullName ?: 'N/A'}"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value" th:text="${user.email ?: 'N/A'}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Role</div>
+                            <span class="role-badge"
+                                  th:classappend="${user.role == 'ADMIN' ? 'role-admin' : (user.role == 'DOCTOR' ? 'role-doctor' : 'role-patient')}"
+                                  th:text="${user.role ?: 'N/A'}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Status -->
+                <div class="detail-section">
+                    <h3>🔐 Account Status</h3>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
                                 <span class="status-badge"
                                       th:classappend="${user.enabled} ? 'status-active' : 'status-inactive'"
-                                      th:text="${user.enabled} ? 'Active' : 'Inactive'"></span>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a th:href="@{/admin/users/{id}(id=${user.id})}" class="btn btn-small btn-info">👁 View</a>
-                                    <a th:href="@{/admin/users/{id}/edit(id=${user.id})}" class="btn btn-small btn-warning">✎ Edit</a>
-                                    <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" style="display: inline;"
-                                          onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                        <button type="submit" class="btn btn-small btn-danger">🗑 Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                      th:text="${user.enabled} ? 'Active' : 'Disabled'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="/admin/users" class="btn btn-secondary">← Back to Users</a>
+                    <a th:href="@{/admin/users/{id}/edit(id=${user.id})}" class="btn btn-warning">✎ Edit User</a>
+                    <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" style="display: inline; flex: 1;">
+                        <button type="submit" class="btn btn-danger" style="width: 100%;"
+                                onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                            🗑 Delete User
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}" method="post" style="display: inline; flex: 1;">
+                        <button type="submit" class="btn"
+                                th:text="${user.enabled} ? '🔒 Disable User' : '🔓 Enable User'"
+                                style="width: 100%; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <div class="card" th:if="${users == null or users.size() == 0}">
-                <div class="empty-state">
-                    <p style="font-size: 24px; margin-bottom: 1rem;">👥</p>
-                    <p>No users found.</p>
-                    <a href="/admin/users/add" class="btn btn-success" style="margin-top: 1rem;">+ Add First User</a>
+            <div class="card" th:if="!${user}">
+                <div style="text-align: center; padding: 3rem; color: #666;">
+                    <p style="font-size: 24px; margin-bottom: 1rem;">❌</p>
+                    <p>User not found.</p>
                 </div>
             </div>
         </div>
