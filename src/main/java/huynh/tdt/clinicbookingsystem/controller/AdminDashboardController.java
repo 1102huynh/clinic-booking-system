@@ -5,6 +5,7 @@ import huynh.tdt.clinicbookingsystem.repository.UserRepository;
 import huynh.tdt.clinicbookingsystem.repository.AppointmentRepository;
 import huynh.tdt.clinicbookingsystem.repository.PatientRepository;
 import huynh.tdt.clinicbookingsystem.repository.DoctorRepository;
+import huynh.tdt.clinicbookingsystem.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +31,9 @@ public class AdminDashboardController {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private AppointmentService appointmentService;
 
     /**
      * Admin dashboard overview
@@ -173,6 +177,36 @@ public class AdminDashboardController {
     }
 
     /**
+     * Confirm an appointment
+     */
+    @PostMapping("/appointments/{appointmentId}/confirm")
+    public String confirmAppointment(@PathVariable Long appointmentId, RedirectAttributes redirectAttributes) {
+        try {
+            appointmentService.confirmAppointment(appointmentId);
+            redirectAttributes.addFlashAttribute("success", "Appointment confirmed successfully!");
+            return "redirect:/admin/appointments/" + appointmentId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to confirm appointment: " + e.getMessage());
+            return "redirect:/admin/appointments/" + appointmentId;
+        }
+    }
+
+    /**
+     * Cancel an appointment
+     */
+    @PostMapping("/appointments/{appointmentId}/cancel")
+    public String cancelAppointment(@PathVariable Long appointmentId, RedirectAttributes redirectAttributes) {
+        try {
+            appointmentService.cancelAppointment(appointmentId);
+            redirectAttributes.addFlashAttribute("success", "Appointment cancelled successfully!");
+            return "redirect:/admin/appointments/" + appointmentId;
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to cancel appointment: " + e.getMessage());
+            return "redirect:/admin/appointments/" + appointmentId;
+        }
+    }
+
+    /**
      * View system statistics
      */
     @GetMapping("/statistics")
@@ -219,4 +253,3 @@ public class AdminDashboardController {
         }
     }
 }
-

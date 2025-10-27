@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Details - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: #333;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 1rem;
+            gap: 2rem;
+        }
+
+        .detail-col {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .notes-section {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            margin-top: 1rem;
+        }
+
+        .notes-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .notes-section p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <h1>📋 Appointment Details</h1>
+        </div>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <a href="/admin/appointments" class="back-link">← Back to Appointments</a>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div class="card" th:if="${appointment}">
+                <div class="page-header" style="margin-bottom: 2rem;">
+                    <h2 class="page-title">Appointment #<span th:text="${appointment.id}"></span></h2>
+                    <span class="status-badge" th:classappend="'status-' + ${appointment.status.toString().toLowerCase()}"
+                          th:text="${appointment.status}"></span>
+                </div>
+
+                <!-- Patient Information -->
+                <div class="detail-section">
+                    <h3>👤 Patient Information</h3>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Patient Name</div>
+                            <div class="detail-value" th:text="${appointment.patient.user.fullName ?: 'N/A'}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value" th:text="${appointment.patient.user.email ?: 'N/A'}"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value" th:text="${appointment.patient.phone ?: 'N/A'}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Date of Birth</div>
+                            <div class="detail-value" th:text="${appointment.patient.dateOfBirth ?: 'N/A'}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctor Information -->
+                <div class="detail-section">
+                    <h3>👨‍⚕️ Doctor Information</h3>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Doctor Name</div>
+                            <div class="detail-value" th:text="${appointment.doctor.user.fullName ?: 'N/A'}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Specialization</div>
+                            <div class="detail-value" th:text="${appointment.doctor.specialization ?: 'N/A'}"></div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value" th:text="${appointment.doctor.user.email ?: 'N/A'}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Experience Years</div>
+                            <div class="detail-value" th:text="${appointment.doctor.experienceYears ?: 'N/A'}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Details -->
+                <div class="detail-section">
+                    <h3>📅 Appointment Details</h3>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Appointment Date & Time</div>
+                            <div class="detail-value" th:text="${#temporals.format(appointment.appointmentTime, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-label">Status</div>
+                            <span class="status-badge" th:classappend="'status-' + ${appointment.status.toString().toLowerCase()}"
+                                  th:text="${appointment.status}"></span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-col">
+                            <div class="detail-label">Created Date</div>
+                            <div class="detail-value" th:text="${#temporals.format(appointment.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="detail-section" th:if="${appointment.notes}">
+                    <h3>📝 Notes</h3>
+                    <div class="notes-section">
+                        <p th:text="${appointment.notes}"></p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="action-buttons">
+                    <a href="/admin/appointments" class="btn btn-secondary">← Back to List</a>
+                    <th:block th:if="${appointment.status.toString() == 'PENDING'}">
+                        <form th:action="@{/admin/appointments/{id}/confirm(id=${appointment.id})}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-success">✓ Confirm Appointment</button>
+                        </form>
+                    </th:block>
+                    <th:block th:if="${appointment.status.toString() != 'COMPLETED' and appointment.status.toString() != 'CANCELLED'}">
+                        <form th:action="@{/admin/appointments/{id}/cancel(id=${appointment.id})}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?');">✗ Cancel Appointment</button>
+                        </form>
+                    </th:block>
+                </div>
+            </div>
+
+            <div class="card" th:if="!${appointment}">
+                <div class="empty-state">
+                    <p style="font-size: 24px; margin-bottom: 1rem;">❌</p>
+                    <p>Appointment not found.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Clinic Booking System. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
